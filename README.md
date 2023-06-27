@@ -8,29 +8,35 @@ These algorithms were built around the notion of *Mining Frequent ItemSets and a
 
 
 Its use and practices are close to those of PrefRec.
-With SufRec, we propose mainly 2 uses, one of them allows an independent construction of trees and an efficient use of multi threads. 
+With SufRec, we propose mainly 3 uses, one of them allows a classic extraction of frequent itemsets. The second is a proposal to use the algorithm in parallel and simultaneously, using several machines. Finally, a last src folder is a proposal for mooving recursive applications. Some details are given in the readme of the src folder.
 
-Moreover, we give possibilities of recursive mooving applications, their details are given in the corresponding article.
+In this version, the init function is not the fastest (to retrieve the database), but is more efficient for high-volume databases.
+
+The detail of the operation of these algorithms is specified in the corresponding scientific article.
+
+Available databases have been compressed. Information about these databases is given in the databases_test folder.
 
 
-**SufRec:**
-* (recursiv) Mining frequent itemSets with a relative Support
-* Get an output Tsv file for information about frequent itemSet
-* Get 2 files necessary to launch Prefrules 
+
+**src_Fim:**
+* Mining frequent itemSets with a relative Support with 3 different recursive methods.
+* Get an output Tsv file for information about frequent itemSets.
+* Get 2 files necessary to launch Prefrules. 
+
+**src_ParFim:**
+* Mining frequent itemSets with a relative Support with 2 different methods.
+* Intended for running with cluster.
+* Get several output Tsv file for information about frequent itemSets.
+
+**src_Mooving:**
+* Mooving applications for extraction of frequent itemsets.
 
 
 ## Creating binaries and getting started
 ```
-cd src/src_SufRecP && make
-cd src/src_SufRecI && make
-cd src/src_SufRecTh && make
-cd src/src_Mooving_SufRecP && make
-cd src/src_Mooving_SufRecI && make
-
-SufRecP and SufRecI : ./SufRec <transaction dataset> < d=item_delimitator> <s=minimal_relative_support "s"> <output_file_set_infos> <output file for coefficient>
-SufRecTH : ./SufRec <transaction dataset> < d=item_delimitator> <s=minimal_relative_support "s"> < n = number_of_threads> <output_file_set_infos> <output file for coefficient> 
-
-Mooving_SufRecP and Mooving_SufRec_I :
+cd src/src_Fim && make
+cd src/src_ParFim && make
+cd src/src_Mooving && make
 
 ```
 
@@ -56,44 +62,21 @@ The folder sample contain a simple small dataset test. You can use it for the ex
 
 ### Example
 ```
-SufRecP et SufRecI
+SufRec in src_Fim
 
-./SufRec ../sample/input/Fruits.txt d=, s=0.20  \\ Do the extraction on the bases "fruits" with a relativ minSup of 0.20, item are delimited by a ",". 
-./SufRec ../sample/input/Fruits.txt d=, s=0.20 ../sample/output_Prefrec/infoset \\ Do the extraction and write frequent set informations in infoset   
-./SufRec ../sample/input/Fruits.txt d=, s=0.20 ../sample/output_Prefrec/infoset ../sample/output_Prefrec/genrules \\ Do the extraction, write frequent set informations in info set,  and create 2 files , genrules.txt and genrules_item.txt, necessary to use Prefrules
+./SufRec ../../sample/input/Fruits.txt d=, s=0.20 t=i o=d  \\ Do the extraction on the base "fruits" with a relativ minSup of 0.20 and the independant version of SufRec_Fim. Items are ordered by decreasing support.
+./SufRec ../../sample/input/Fruits.txt d=, s=0.20 t=tf4 \\ Do the extraction on the base "fruits" with a relativ minSup of 0.20 and the multi thread version of SufRec_Fim. It uses fifo organisation and use 4 threads.
+./SufRec ../../sample/input/Fruits.txt d=, s=0.20 t=tc4 \\ Only count frequent itemsets on the base "fruits" with a relativ minSup of 0.20 and the multi thread version of SufRec_Fim. It uses fifo organisation and use 4 threads.
 
-SufRecTH
+SufRec in src_ParFim
 
-./SufRec ../sample/input/Fruits.txt d=, s=0.20 n=4  \\ Do the extraction on the bases "fruits" with a relativ minSup of 0.20, item are delimited by a ",", and the number of threads if egal to 4. 
-./SufRec ../sample/input/Fruits.txt d=, s=0.20 n=4 ../sample/output_Prefrec/infoset \\ Do the extraction and write frequent set informations in infoset    
-./SufRec ../sample/input/Fruits.txt d=, s=0.20 n=4 ../sample/output_Prefrec/infoset ../sample/output_Prefrec/genrules \\ Do the extraction, write frequent set informations in info set,  and create 2 files , genrules.txt and genrules_item.txt, necessary to use Prefrules
+./SufRec ../../sample/input/Fruits.txt d=, s=0.20 t=i m=5 x=1 o=d  \\ Do the extraction on the bases "fruits" with a relativ minSup of 0.20 and the independant version of SufRec_Fim. This extraction is supposed to be on the first machine, total of machine is 5. Items are ordered by decreasing support.
+
+SufRec in src_Mooving
+
+./SufRec ../../sample/input/Fruits.txt d=, s=0.20 t=i 5 3   \\ Do the extraction on the bases "fruits" with a relativ minSup of 0.20 and the independant version of SufRec_Fim. It starts by finding all the frequent itemsets with 5 items, then make 3 iterations of the mooving application.
+
 ```
-
-## Parameters for SufRec :
-|param|required|note|
-|--------------------|--------|--------|
-|    transaction dataset    |    yes    | The Dataset transaction  |  
-|    item delimitator "d="   |    yes    | the item separator you use with your dataset transaction | 
-|    minimal relative support "s="   |    yes    | the minimal relativ support you wish     | 
-|    ordering frequent 1-itemset "o="   |    no    | n for unordered, i for ascendant order, d for decreasing order      | 
-|    output file set infos    |    no    |  For file frequent set informations, put the directory file (with no extention type )    | 
-|    output file for coefficient    |    no    |  If you want to use Prefrules, put the directory file (with no exention type)| 
-
-
-
-## Parameters for SufRecTH :
-|param|required|note|
-|--------------------|--------|--------|
-|    transaction dataset    |    yes    | The Dataset transaction  |  
-|    item delimitator "d="   |    yes    | the item separator you use with your dataset transaction | 
-|    minimal relative support "s="   |    yes    | the minimal relativ support you wish     | 
-|	 number of thread "n="	| yes | the number of thread you wan't to use |
-|    ordering frequent 1-itemset "o="   |    no    | n for unordered, i for ascendant order, d for decreasing order      | 
-|    output file set infos    |    no    |  For file frequent set informations, put the directory file (with no extention type )    | 
-|    output file for coefficient    |    no    |  If you want to use Prefrules, put the directory file (with no exention type)| 
-
-
-
 
 
 ## Definitions of frequent itemSets :
