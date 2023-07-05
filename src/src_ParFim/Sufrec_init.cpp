@@ -179,16 +179,14 @@ void Init_data (char * pathfile, uint64_t *** Bitdata, int ** sum_1freq, info_pr
       return;
     }
   t = 0;  
-  std::string * varnames = new std::string [nvar];  
+  std::unordered_map<int,std::string> map_names;
 
   for (itmap = mappy.begin(); itmap != itendmap;itmap++) 
     { 
 
       if (is_good_item[itmap->second])
         { 
-          varnames[t] = itmap->first;
-          t++;
-          continue;
+          map_names[itmap->second] = itmap->first; 
         }    
     } 
 
@@ -229,11 +227,13 @@ void Init_data (char * pathfile, uint64_t *** Bitdata, int ** sum_1freq, info_pr
 
   z= 0;    
   (*Bitdata) = (uint64_t**)malloc(nvar*sizeof(uint64_t*));
+  std::string * varnames = new std::string [nvar];
   (*sum_1freq) = (int*)malloc(nvar*sizeof(int));
   for (t = 0; t < nvar_tot;t++)
     {
-      if (is_good_item[t]) {(*sum_1freq)[z] = item_sup[t]; (*Bitdata)[z++] = Bdata_tot[t];}
+      if (is_good_item[t]) {(*sum_1freq)[z] = item_sup[t]; varnames[z] = map_names[t]; (*Bitdata)[z++] = Bdata_tot[t];}
     }
+
   // Reduce first Bitdata to only pointers of frequent 1 item
   free (Bdata_tot);
   for (t = 0; t < nrows;t++) {free(TRS[t]);}
