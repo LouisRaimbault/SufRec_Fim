@@ -21,7 +21,7 @@ The subtrees to be built are defined in advance by the machine number and the to
 
 
 **src_Mooving:**
-**The tree always contains the frequent itemsets of a given number of items. At each iteration, the least frequent item is deleted (with all its itemsets) and a new item (with all its frequent itemsets) is added.**
+**The tree always contains the frequent itemsets of a given number of items. At each iteration, the item wich generates the smallest number of frequent itemset is deleted (with all its itemsets) and a new item (with all its frequent itemsets) is added.**
 * p : Based on Suffix Tree dependant construction, for each new item, a new subtree is rooted by traversing the existing tree
 * i : Based on Suffix Tree independant construction, for each new item, a new subtree is rooted using only the set of items 
 
