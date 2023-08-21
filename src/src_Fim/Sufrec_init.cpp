@@ -196,6 +196,7 @@ void Init_data (char * pathfile, uint64_t *** Bitdata, int ** sum_1freq, info_pr
   z_i = 0; t = 0;
   int k = 0;
   uint64_t u =0;
+  if (rst == 0) {maxul = maxul+1;}
   while(z_i < maxul-1)
   { 
     for (t =0; t < 64; t++,k++)
@@ -226,6 +227,7 @@ void Init_data (char * pathfile, uint64_t *** Bitdata, int ** sum_1freq, info_pr
       }     
 
   z= 0;    
+  if (rst == 0) {maxul = maxul - 1;}
   (*Bitdata) = (uint64_t**)malloc(nvar*sizeof(uint64_t*));
   std::string * varnames = new std::string [nvar];
   (*sum_1freq) = (int*)malloc(nvar*sizeof(int));
