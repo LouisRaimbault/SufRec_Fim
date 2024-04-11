@@ -13,71 +13,65 @@
 
 
 
-void creabitfield_TF ( int *ind,int* mod,uint64_t * ptul, uint64_t * nlgtabl,  int nbc)
-{   auto * yb = &Ultab_TF[0]; uint64_t u; int t = 0; auto * ybi = &Ultab_TF[0];
-    auto * yd = &Ultab_TF[64];
-    for (auto a =0; a < nbc ; a++)
-    {  
-      for (yb = ybi; yb != yd; yb++)
-      { 
-        u ^= (-((ptul[ind[t]]>>mod[t++]) & 1UL) ^ u) & *yb;
-      }
-      nlgtabl[a] = u;
-    }
-}
-
-void creabitfieldr_TF ( int *ind,int * mod,uint64_t * ptul, uint64_t * nlgtabl,  int nbdases,  int reste)
-{   
-    auto * yb = &Ultab_TF[0]; uint64_t u; int t = 0;
-    auto * yd = &Ultab_TF[64]; auto * ybi = &Ultab_TF[0];
-    for (auto a =0; a < nbdases ; a++)
-    {  
-      for (yb = ybi; yb != yd; yb++)
-      { 
-        u ^= (-((ptul[ind[t]]>>mod[t++]) & 1UL) ^ u) & *yb;
-      }
-      nlgtabl[a] = u;
-    }
-    u = 0;
-    for ( yb = ybi; yb != &Ultab_TF[reste]; yb++) 
-    {
-     u ^= (-((ptul[ind[t]]>>mod[t++]) & 1UL) ^ u) & *yb;}
-    nlgtabl[nbdases] = u;
-
-}
-
-
-
-void init_Rnodes_TF (rnodes* outrnodes, int & ngroot  ,int* vecsom,  int* tindices ,int * mod,uint64_t** Bitdata, int nbleft, int nbcases,  int reste, int  * nb_freq_)
+void init_Rnodes_TF (rnodes* outrnodes, int* ngroot ,int* vecsom,  int* ind ,int * mod,uint64_t** Bitdata, int nbleft, int nbcases,  int reste, int * nb_freq_)
 { 
-  
+  auto * yb = &Ultab_TF[0]; uint64_t u; int t = 0; int j,nbc;
+  auto * yd = &Ultab_TF[64]; auto * ybi = &Ultab_TF[0]; uint64_t * ptul;
   int sum = 0; 
   if (reste ==0)
-    {for (auto i=0; i < nbleft;i++)
+    { nbc = nbcases;
+      for (auto i=0; i < nbleft;i++)
         { sum = vecsom[i];
           if (sum<minsup_TF) {outrnodes[i].tab=NULL; continue;}
-          ngroot++;
-          uint64_t * ptu = (uint64_t*) malloc(nbcases*SUL);
-          creabitfield_TF(tindices,mod,Bitdata[i],ptu,nbcases);
+          (*ngroot)++;
+          uint64_t * ptu = (uint64_t*) malloc(nbc*SUL);
+          ptul = Bitdata[i];
+          t = 0;
+          for (auto a =0; a < nbc ; a++)
+          {  u = 0; j = 0;
+            for (yb = ybi; yb != yd; yb++,j++)
+            { 
+              u |= (ptul[ind[t]] >> mod[t++] << j)&*yb;
+            }
+            ptu[a] = u;
+          }
           outrnodes[i].sup = sum;
           outrnodes[i].tab=ptu;
         }
-      (*nb_freq_) += ngroot; 
-
+     (*nb_freq_) += (*ngroot);
+     return; 
     }
 
-  else {
-        for (auto i=0; i < nbleft;i++)
-          { sum = vecsom[i];
-            if (sum<minsup_TF) {outrnodes[i].tab=NULL; continue;}
-            ngroot++;
-            uint64_t * ptu = (uint64_t*) malloc(nbcases*SUL);
-            creabitfieldr_TF(tindices,mod,Bitdata[i],ptu,nbcases-1,reste);
-            outrnodes[i].sup = sum;
-            outrnodes[i].tab=ptu;
-          }
-        (*nb_freq_) += ngroot;
+
+  nbc = nbcases-1;
+  
+  for (auto i=0; i < nbleft;i++)
+    { sum = vecsom[i];
+      
+      if (sum<minsup_TF) {outrnodes[i].tab=NULL;  continue;}
+      (*ngroot)++;
+      uint64_t * ptu = (uint64_t*) malloc(nbcases*SUL);
+      ptul = Bitdata[i];
+      t = 0; 
+      for (auto a =0; a < nbc ; a++)
+      { j = 0; u = 0;
+        for (yb = ybi; yb != yd; yb++,j++)
+        { 
+          u |= (ptul[ind[t]] >> mod[t++] << j)&*yb;
+        }
+        ptu[a] = u;
       }
+      u = 0; j = 0;
+      for ( yb = ybi; yb != &Ultab_TF[reste]; yb++,j++) 
+      {
+       u |= (ptul[ind[t]] >> mod[t++] << j)&*yb;
+      }
+      ptu[nbc] = u;
+      outrnodes[i].sup = sum;
+      outrnodes[i].tab=ptu;     
+    }
+  (*nb_freq_) += (*ngroot);
+      
 }
 
 
@@ -197,7 +191,7 @@ void thread_witdh ( uint64_t ** Bitdata, int maxul, int * nb_freq_, pnodes ** ta
     ngroot= 0;
  
  
- init_Rnodes_TF(tabrn,ngroot,rootsum,indices,mod,Bitdata,cur_v,nbc,reste,nb_freq_);
+ init_Rnodes_TF(tabrn,&ngroot,rootsum,indices,mod,Bitdata,cur_v,nbc,reste,nb_freq_);
  free(indices);
  free(mod);
   pnodes ** trpnr = &nouvnod->son;
