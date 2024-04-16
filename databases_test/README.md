@@ -2,7 +2,7 @@
 
 The purpose of this folder is to access various databases, whether synthetically generated or not.
 
-If you want more information about the simulations results please have a look to the simulation section part of : (1)
+If you want more information about the simulations results please have a look to the simulation section part of : SufRec, an algorithm for mining association rules: Recursivity and task parallelism.  Expert    Systems with Applications, Volume 236, 121321  (2024).   https://doi.org/10.1016/j.eswa.2023.121321.
 The databases are in transaction format as defined below.
 
 |transactions|

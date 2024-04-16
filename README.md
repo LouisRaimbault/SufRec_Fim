@@ -12,7 +12,7 @@ With SufRec, we propose mainly 3 uses, one of them allows a classic extraction o
 
 In this version, the init function is not the fastest (to retrieve the database), but is more efficient for high-volume databases.
 
-The detail of the operation of these algorithms is specified in the corresponding scientific article.
+The detail of the operation of these algorithms is specified in the corresponding scientific article (SufRec, an algorithm for mining association rules: Recursivity and task parallelism.  Expert    Systems with Applications, Volume 236, 121321  (2024).   https://doi.org/10.1016/j.eswa.2023.121321)
 
 Available databases have been compressed. Information about these databases is given in the databases_test folder.
 
